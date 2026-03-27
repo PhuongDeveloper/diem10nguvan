@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
 import { useState } from 'react';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function Navbar() {
   const { user, signInWithGoogle, signOut, loading } = useAuth();
@@ -104,8 +105,9 @@ export default function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={signInWithGoogle}
-                className="ml-2 px-5 py-2 bg-primary border-2 border-primary-dark text-white text-sm font-black rounded-xl shadow-[4px_4px_0_#2D3436] hover:translate-y-[-2px] transition-transform"
+                className="ml-2 px-5 py-2 flex items-center gap-2 bg-white border-2 border-primary-dark text-primary-dark text-sm font-black rounded-xl shadow-[4px_4px_0_#2D3436] hover:translate-y-[-2px] transition-transform hover:shadow-[6px_6px_0_#2D3436]"
               >
+                <FcGoogle className="w-5 h-5" />
                 Đăng nhập
               </motion.button>
             )}

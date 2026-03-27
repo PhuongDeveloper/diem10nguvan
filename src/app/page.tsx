@@ -11,6 +11,7 @@ import type { ExamInfo } from '@/lib/examData';
 import ExamCard from '@/components/ExamCard';
 import Leaderboard from '@/components/Leaderboard';
 import StickyNote from '@/components/StickyNote';
+import { FcGoogle } from 'react-icons/fc';
 
 interface ProgressData {
   examId: string;
@@ -460,7 +461,7 @@ export default function HomePage() {
                 onClick={handleLogin}
                 className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white text-gray-800 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:shadow-[4px_4px_0_#2D3436] hover:-translate-y-1 transition-all font-bold"
               >
-                <img src="/google.svg" alt="Google" className="w-5 h-5" />
+                <FcGoogle className="w-5 h-5" />
                 Đăng nhập bằng Google
               </button>
             </motion.div>

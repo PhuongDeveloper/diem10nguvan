@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FeedbackOverlay from './FeedbackOverlay';
 
 interface Pair {
   concept: string;
@@ -15,6 +16,7 @@ export default function MatchGame() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [feedbackType, setFeedbackType] = useState<'correct' | 'incorrect' | null>(null);
 
   const fetchPairs = useCallback(async () => {
     setIsLoading(true);
@@ -75,6 +77,7 @@ export default function MatchGame() {
 
       if (index1 === index2 && type1 !== type2) {
         // Match!
+        setFeedbackType('correct');
         setTimeout(() => {
           setItems(prev => prev.map(i => (i.id === id1 || i.id === id2) ? { ...i, matched: true } : i));
           setSelectedIds([]);
@@ -82,8 +85,10 @@ export default function MatchGame() {
         }, 500);
       } else {
         // Wrong
+        setFeedbackType('incorrect');
         setTimeout(() => {
           setSelectedIds([]);
+          setFeedbackType(null);
         }, 800);
       }
     }
@@ -127,7 +132,16 @@ export default function MatchGame() {
   if (items.length === 0) return null;
 
   return (
-    <div className="flex flex-col items-center max-w-3xl mx-auto w-full">
+    <motion.div 
+      className="flex flex-col items-center max-w-3xl mx-auto w-full"
+      animate={feedbackType === 'incorrect' ? { x: [-5, 5, -5, 5, 0] } : {}}
+      transition={{ duration: 0.3 }}
+    >
+      <FeedbackOverlay 
+        type={feedbackType} 
+        onFinished={() => setFeedbackType(null)} 
+        scoreValue={10}
+      />
       <div className="text-center mb-6">
         <h2 className="text-xl font-black text-primary-dark">Nối Khái Niệm - Minh Họa</h2>
         <p className="text-sm font-bold text-text-secondary mt-1">Điểm: {score}</p>
@@ -184,6 +198,6 @@ export default function MatchGame() {
           </button>
         </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

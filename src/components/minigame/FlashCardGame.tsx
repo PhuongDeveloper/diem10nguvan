@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FeedbackOverlay from './FeedbackOverlay';
 
 interface FlashCard {
   term: string;
@@ -13,6 +14,8 @@ export default function FlashCardGame() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [cards, setCards] = useState<FlashCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [score, setScore] = useState(0);
+  const [feedbackType, setFeedbackType] = useState<'correct' | 'incorrect' | null>(null);
 
   const fetchCards = useCallback(async () => {
     setIsLoading(true);
@@ -40,15 +43,21 @@ export default function FlashCardGame() {
   }, [fetchCards]);
 
   const handleNext = () => {
-    setIsFlipped(false);
+    setFeedbackType('correct');
+    setScore(s => s + 5);
+    
     setTimeout(() => {
-      if (currentIndex + 1 < cards.length) {
-        setCurrentIndex((prev) => prev + 1);
-      } else {
-        // Fetch new batch when done
-        fetchCards();
-      }
-    }, 150);
+      setFeedbackType(null);
+      setIsFlipped(false);
+      setTimeout(() => {
+        if (currentIndex + 1 < cards.length) {
+          setCurrentIndex((prev) => prev + 1);
+        } else {
+          // Fetch new batch when done
+          fetchCards();
+        }
+      }, 150);
+    }, 400);
   };
 
   if (isLoading) {
@@ -76,10 +85,20 @@ export default function FlashCardGame() {
   const currentCard = cards[currentIndex];
 
   return (
-    <div className="flex flex-col items-center max-w-lg mx-auto w-full">
+    <motion.div className="flex flex-col items-center max-w-lg mx-auto w-full">
+      <FeedbackOverlay 
+        type={feedbackType} 
+        onFinished={() => setFeedbackType(null)} 
+        scoreValue={5}
+      />
       <div className="text-center mb-6">
         <h2 className="text-xl font-black text-primary-dark">Lật Thẻ Ôn Tập</h2>
-        <p className="text-sm text-text-secondary">Chạm vào thẻ để xem đáp án</p>
+        <div className="flex items-center justify-center gap-4 mt-1">
+          <p className="text-sm text-text-secondary">Chạm vào thẻ để xem đáp án</p>
+          <span className="text-sm font-black bg-amber-100 text-amber-800 px-2 py-0.5 rounded border border-amber-300">
+            Điểm: {score}
+          </span>
+        </div>
       </div>
 
       <div className="w-full relative h-[300px] perspective-1000">
@@ -121,6 +140,6 @@ export default function FlashCardGame() {
           {currentIndex + 1 < cards.length ? 'Câu Tiếp Theo ➔' : 'Tạo Thẻ Mới ➔'}
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

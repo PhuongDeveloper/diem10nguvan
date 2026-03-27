@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FeedbackOverlay from './FeedbackOverlay';
 
 interface QuizQuestion {
   question: string;
@@ -15,6 +16,7 @@ export default function SpeedQuizGame() {
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState<'playing' | 'end'>('playing');
   const [isLoading, setIsLoading] = useState(true);
+  const [feedbackType, setFeedbackType] = useState<'correct' | 'incorrect' | null>(null);
 
   const fetchQuiz = useCallback(async () => {
     setIsLoading(true);
@@ -45,15 +47,21 @@ export default function SpeedQuizGame() {
   const handleAnswer = (selectedIndex: number) => {
     if (questions.length === 0) return;
     const isCorrect = selectedIndex === questions[currentIndex].correct;
-    if (isCorrect) setScore(s => s + 10);
+    if (isCorrect) {
+      setScore(s => s + 10);
+      setFeedbackType('correct');
+    } else {
+      setFeedbackType('incorrect');
+    }
 
     setTimeout(() => {
+      setFeedbackType(null);
       if (currentIndex + 1 < questions.length) {
         setCurrentIndex(prev => prev + 1);
       } else {
         setGameState('end');
       }
-    }, 400);
+    }, 800);
   };
 
   const restart = () => {
@@ -105,7 +113,16 @@ export default function SpeedQuizGame() {
   const currentQ = questions[currentIndex];
 
   return (
-    <div className="flex flex-col max-w-xl mx-auto w-full">
+    <motion.div 
+      className="flex flex-col max-w-xl mx-auto w-full"
+      animate={feedbackType === 'incorrect' ? { x: [-5, 5, -5, 5, 0] } : {}}
+      transition={{ duration: 0.3 }}
+    >
+      <FeedbackOverlay 
+        type={feedbackType} 
+        onFinished={() => setFeedbackType(null)} 
+        scoreValue={10}
+      />
       <div className="flex justify-between items-end mb-6">
         <h2 className="text-lg font-black text-primary-dark">Trắc Nghiệm Nhanh</h2>
         <div className="text-sm font-bold bg-amber-100 text-amber-800 px-3 py-1 rounded-lg border-2 border-amber-500 shadow-[2px_2px_0_#F59E0B]">
@@ -136,6 +153,6 @@ export default function SpeedQuizGame() {
           </button>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

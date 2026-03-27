@@ -58,7 +58,7 @@ export default function HomePage() {
       try {
         const snap = await getDocs(collection(db, 'progress'));
         const examScores: Record<string, number[]> = {};
-        
+
         snap.docs.forEach((doc) => {
           const data = doc.data() as ProgressData;
           if (data.highestScore >= 0) {
@@ -211,28 +211,15 @@ export default function HomePage() {
               if (!isAIMode) setShowAIModeModal(true);
               else setIsAIMode(false);
             }}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl border-2 font-black text-sm transition-all hover:-translate-y-1 ${
-              isAIMode
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl border-2 font-black text-sm transition-all hover:-translate-y-1 ${isAIMode
                 ? 'bg-amber-400 border-amber-800 text-amber-900 shadow-[4px_4px_0_#92400E]'
                 : 'bg-white border-primary-dark text-primary-dark shadow-[4px_4px_0_#2D3436]'
-            }`}
+              }`}
           >
             <span>{isAIMode ? 'TẮT' : 'BẬT'}</span>
             <span>Chế độ Luyện tập với AI</span>
           </button>
         </div>
-
-        {/* AI Mode Banner */}
-        {isAIMode && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 flex sm:inline-flex items-start sm:items-center gap-2 bg-amber-100 border-2 border-amber-500 rounded-xl px-4 py-3 sm:py-2 text-xs sm:text-sm font-bold text-amber-800 text-left mx-4 sm:mx-0 shadow-[2px_2px_0_#92400E]"
-          >
-            <span className="text-lg shrink-0">🤖</span>
-            <span>Đang bật Chế độ Luyện tập — Click vào đề để làm bài có AI hỗ trợ</span>
-          </motion.div>
-        )}
       </motion.div>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -252,17 +239,16 @@ export default function HomePage() {
                       setCurrentPage(1);
                     }
                   }}
-                  className={`px-4 py-2 rounded-xl text-sm font-black transition-all duration-200 border-2 ${
-                    activeGrade === g.key
+                  className={`px-4 py-2 rounded-xl text-sm font-black transition-all duration-200 border-2 ${activeGrade === g.key
                       ? 'bg-primary border-primary-dark text-white shadow-[2px_2px_0_#2D3436] translate-y-[-1px]'
                       : 'bg-white text-text-primary border-transparent hover:border-border'
-                  }`}
+                    }`}
                 >
                   {g.label}
                 </motion.button>
               ))}
             </div>
-            
+
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-sm font-bold text-text-secondary hidden xl:inline">Ưu tiên:</span>
               <select
@@ -390,7 +376,7 @@ export default function HomePage() {
                 </div>
                 <h2 className="text-xl font-black text-primary-dark">Chế Độ AI Tutor</h2>
               </div>
-              
+
               <div className="mb-6 text-text-primary leading-relaxed space-y-4">
                 <p className="text-sm font-semibold">
                   Hệ thống AI sẽ đồng hành và hướng dẫn bạn trong suốt quá trình làm bài:

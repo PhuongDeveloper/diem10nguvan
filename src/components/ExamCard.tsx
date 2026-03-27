@@ -9,8 +9,10 @@ interface ExamCardProps {
   grade: number;
   title: string;
   highestScore?: number;
+  averageScore?: number;
   status: 'red' | 'yellow' | 'green';
   index: number;
+  onClick?: () => void;
 }
 
 export default function ExamCard({
@@ -18,14 +20,20 @@ export default function ExamCard({
   grade,
   title,
   highestScore,
+  averageScore,
   status,
   index,
+  onClick,
 }: ExamCardProps) {
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
 
   const handleNavigate = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (onClick) {
+      onClick();
+      return;
+    }
     if (isNavigating) return;
     setIsNavigating(true);
     // Smooth delay before routing to allow animation to play out
@@ -101,17 +109,23 @@ export default function ExamCard({
         </div>
 
         {/* Score footer */}
-        <div className="mt-auto">
-          {highestScore !== undefined && highestScore > 0 ? (
-            <div className="flex items-center justify-between bg-white/60 p-3 rounded-xl border-2 border-transparent group-hover:border-black/5 transition-colors">
-              <span className="text-sm font-bold text-text-secondary">Điểm cao nhất</span>
+        <div className="mt-auto flex flex-col gap-2">
+          <div className="flex items-center justify-between bg-white/60 p-2 px-3 rounded-xl border border-transparent group-hover:border-black/5 transition-colors">
+            <span className="text-xs font-bold text-text-secondary">TB mọi người</span>
+            <span className="text-sm font-black text-primary-dark">
+              {averageScore && averageScore > 0 ? averageScore.toFixed(1) : '-.-'}
+            </span>
+          </div>
+          {highestScore !== undefined && highestScore >= 0 ? (
+            <div className="flex items-center justify-between bg-white/80 p-2 px-3 rounded-xl border-2 border-transparent group-hover:border-black/5 transition-colors">
+              <span className="text-sm font-bold text-text-secondary">Điểm của bạn</span>
               <span className="text-lg font-black text-primary-dark">
                 {highestScore.toFixed(1)}
               </span>
             </div>
           ) : (
-            <div className="flex items-center justify-between bg-white/40 p-3 rounded-xl">
-              <span className="text-sm font-bold text-text-light">Chưa có điểm</span>
+            <div className="flex items-center justify-between bg-white/40 p-2 px-3 rounded-xl">
+              <span className="text-sm font-bold text-text-light">Điểm của bạn</span>
               <span className="text-lg font-black text-text-light opacity-50">-.-</span>
             </div>
           )}

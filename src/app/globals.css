@@ -1,26 +1,181 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ===== Custom Design tokens for Thi Văn Quán ===== */
+/* Cartoon/Anime inspired color palette */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: #6C5CE7;
+  --color-primary-light: #A29BFE;
+  --color-primary-dark: #4834D4;
+  --color-secondary: #FD79A8;
+  --color-secondary-light: #FDCB6E;
+  --color-accent-green: #00B894;
+  --color-accent-yellow: #FFEAA7;
+  --color-accent-red: #FF7675;
+  --color-accent-blue: #74B9FF;
+  --color-bg-main: #F8F5FF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-dark: #2D3436;
+  --color-text-primary: #2D3436;
+  --color-text-secondary: #636E72;
+  --color-text-light: #B2BEC3;
+  --color-border: #DFE6E9;
+  --color-status-red: #FF7675;
+  --color-status-yellow: #FDCB6E;
+  --color-status-green: #00B894;
+
+  --font-sans: 'Quicksand', 'Nunito', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ===== Global Styles ===== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary-light);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* ===== Animated Background Blobs ===== */
+.blob-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.blob-bg::before,
+.blob-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.15;
+  filter: blur(80px);
+  animation: blobFloat 20s ease-in-out infinite;
+}
+.blob-bg::before {
+  width: 600px;
+  height: 600px;
+  background: var(--color-primary);
+  top: -200px;
+  left: -200px;
+}
+.blob-bg::after {
+  width: 500px;
+  height: 500px;
+  background: var(--color-secondary);
+  bottom: -200px;
+  right: -200px;
+  animation-delay: -10s;
+}
+
+@keyframes blobFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(100px, 50px) scale(1.1); }
+  50% { transform: translate(-50px, 100px) scale(0.9); }
+  75% { transform: translate(50px, -50px) scale(1.05); }
+}
+
+/* ===== Paper Texture for Answer Area ===== */
+.paper-texture {
+  background-color: #FFFEF5;
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent 31px,
+      #E8E4D9 31px,
+      #E8E4D9 32px
+    );
+  background-position: 0 8px;
+  line-height: 32px;
+  padding: 8px 20px;
+  font-family: 'Patrick Hand', 'Quicksand', cursive, sans-serif;
+  font-size: 18px;
+}
+
+/* ===== Exam Card Status Colors ===== */
+.card-status-red {
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-status-red);
+  box-shadow: 4px 4px 0px #FF767530;
+}
+.card-status-yellow {
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-status-yellow);
+  box-shadow: 4px 4px 0px #FDCB6E30;
+}
+.card-status-green {
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-status-green);
+  box-shadow: 4px 4px 0px #00B89430;
+}
+
+/* ===== Docx Viewer Styles ===== */
+.docx-content {
+  padding: 24px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.docx-content p {
+  margin-bottom: 12px;
+}
+.docx-content strong, .docx-content b {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+.docx-content em, .docx-content i {
+  font-style: italic;
+}
+.docx-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+}
+.docx-content table td,
+.docx-content table th {
+  border: 1px solid var(--color-border);
+  padding: 8px 12px;
+}
+
+/* ===== Leaderboard ===== */
+.leaderboard-rank-1 {
+  background: #FFD700;
+  border: 2px solid #5D4037;
+  color: #5D4037;
+  box-shadow: 3px 3px 0px #5D4037;
+}
+.leaderboard-rank-2 {
+  background: #C0C0C0;
+  border: 2px solid #37474F;
+  color: #37474F;
+  box-shadow: 3px 3px 0px #37474F;
+}
+.leaderboard-rank-3 {
+  background: #CD7F32;
+  border: 2px solid #3E2723;
+  color: #3E2723;
+  box-shadow: 3px 3px 0px #3E2723;
 }

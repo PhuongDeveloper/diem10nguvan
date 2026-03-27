@@ -324,7 +324,7 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
       </div>
 
       {/* Left panel: DocxViewer */}
-      <div className="flex-1 h-1/2 md:h-full border-b-4 md:border-b-0 md:border-r-4 border-primary-dark bg-white overflow-hidden relative shadow-inner">
+      <div className="h-[40vh] md:h-full md:flex-1 border-b-4 md:border-b-0 md:border-r-4 border-primary-dark bg-white overflow-hidden relative shadow-inner shrink-0">
         <div className="absolute top-0 inset-x-0 h-14 bg-white/95 backdrop-blur border-b-2 border-border flex items-center px-4 z-10 shadow-sm md:justify-between">
           <button
             onClick={() => {
@@ -346,7 +346,7 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
       </div>
 
       {/* Right panel: AnswerPanel / AITutorPanel */}
-      <div className="w-full md:w-[45%] lg:w-[40%] xl:w-[35%] h-1/2 md:h-full shadow-xl z-20 overflow-hidden flex flex-col">
+      <div className="flex-1 md:flex-none w-full md:w-[45%] lg:w-[40%] xl:w-[35%] md:h-full shadow-xl z-20 overflow-hidden flex flex-col">
         {isAIMode ? (
           <>
             <div className="bg-amber-400 border-b-4 border-amber-800 px-4 py-2 shrink-0 flex items-center gap-2">

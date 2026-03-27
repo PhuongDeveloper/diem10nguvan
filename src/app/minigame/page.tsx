@@ -35,18 +35,18 @@ export default function MinigamePage() {
         </motion.div>
       </div>
 
-      <div className="max-w-4xl mx-auto mb-10 flex flex-wrap justify-center gap-4">
+      <div className="max-w-4xl mx-auto mb-10 flex flex-wrap justify-center gap-2 sm:gap-4">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-6 py-3 rounded-xl border-2 font-bold text-sm transition-all flex items-center gap-2 ${activeTab === tab.id
+            className={`px-3 sm:px-6 py-2 sm:py-3 rounded-xl border-2 font-bold text-xs sm:text-sm transition-all flex items-center gap-1.5 sm:gap-2 ${activeTab === tab.id
                 ? 'bg-primary border-primary-dark text-white shadow-[4px_4px_0_#2D3436] -translate-y-1'
                 : 'bg-white border-border text-text-secondary hover:border-primary hover:text-primary'
               }`}
           >
-            <span className="text-lg">{tab.icon}</span>
-            {tab.label}
+            <span className="text-base sm:text-lg shrink-0">{tab.icon}</span>
+            <span className="truncate">{tab.label}</span>
           </button>
         ))}
       </div>

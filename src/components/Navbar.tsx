@@ -28,7 +28,7 @@ export default function Navbar() {
             >
               文
             </motion.div>
-            <div>
+            <div className="hidden sm:block">
               <h1 className="text-xl font-black text-primary-dark drop-shadow-[2px_2px_0_#FDCB6E]">
                 Thi Văn Quán
               </h1>
@@ -36,15 +36,20 @@ export default function Navbar() {
                 Luyện thi Ngữ Văn cùng AI
               </p>
             </div>
+            <div className="sm:hidden">
+              <h1 className="text-xl font-black text-primary-dark drop-shadow-[2px_2px_0_#FDCB6E] tracking-tight">
+                TVQ
+              </h1>
+            </div>
           </Link>
 
           {/* Nav Links */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Link href="/">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 text-sm font-semibold text-text-secondary hover:text-primary transition-colors rounded-lg hover:bg-primary/5"
+                className="px-2 sm:px-4 py-2 text-sm font-semibold text-text-secondary hover:text-primary transition-colors rounded-lg hover:bg-primary/5"
               >
                 Đề thi
               </motion.button>
@@ -53,7 +58,7 @@ export default function Navbar() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 text-sm font-semibold text-text-secondary hover:text-primary transition-colors rounded-lg hover:bg-primary/5"
+                className="px-2 sm:px-4 py-2 text-sm font-semibold text-text-secondary hover:text-primary transition-colors rounded-lg hover:bg-primary/5"
               >
                 Minigame
               </motion.button>
@@ -105,10 +110,11 @@ export default function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={signInWithGoogle}
-                className="ml-2 px-5 py-2 flex items-center gap-2 bg-white border-2 border-primary-dark text-primary-dark text-sm font-black rounded-xl shadow-[4px_4px_0_#2D3436] hover:translate-y-[-2px] transition-transform hover:shadow-[6px_6px_0_#2D3436]"
+                className="ml-1 sm:ml-2 px-3 sm:px-5 py-2 flex items-center gap-1 sm:gap-2 bg-white border-2 border-primary-dark text-primary-dark text-xs sm:text-sm font-black rounded-xl shadow-[4px_4px_0_#2D3436] hover:translate-y-[-2px] transition-transform hover:shadow-[6px_6px_0_#2D3436]"
               >
-                <FcGoogle className="w-5 h-5" />
-                Đăng nhập
+                <FcGoogle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                <span className="hidden sm:inline">Đăng nhập</span>
+                <span className="sm:hidden">Login</span>
               </motion.button>
             )}
           </div>

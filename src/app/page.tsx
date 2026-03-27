@@ -193,14 +193,14 @@ export default function HomePage() {
         className="text-center mb-10"
       >
         <motion.h1
-          className="text-4xl md:text-5xl font-black mb-3 text-primary-dark tracking-tight drop-shadow-[2px_2px_0px_#2D3436]"
+          className="text-3xl sm:text-4xl md:text-5xl font-black mb-3 text-primary-dark tracking-tight drop-shadow-[2px_2px_0px_#2D3436]"
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 15 }}
         >
           Chọn Đề & Bắt Đầu Luyện Thi
         </motion.h1>
-        <p className="text-text-secondary text-lg max-w-xl mx-auto">
+        <p className="text-text-secondary text-base sm:text-lg max-w-xl mx-auto px-4">
           AI sẽ chấm bài, phân tích điểm yếu và đưa ra lời khuyên riêng cho bạn
         </p>
 
@@ -227,9 +227,10 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 inline-flex items-center gap-2 bg-amber-100 border-2 border-amber-500 rounded-xl px-4 py-2 text-sm font-bold text-amber-800"
+            className="mt-4 flex sm:inline-flex items-start sm:items-center gap-2 bg-amber-100 border-2 border-amber-500 rounded-xl px-4 py-3 sm:py-2 text-xs sm:text-sm font-bold text-amber-800 text-left mx-4 sm:mx-0 shadow-[2px_2px_0_#92400E]"
           >
-            Đang bật Chế độ Luyện tập — Click vào đề để bắt đầu luyện tập có AI hỗ trợ
+            <span className="text-lg shrink-0">🤖</span>
+            <span>Đang bật Chế độ Luyện tập — Click vào đề để làm bài có AI hỗ trợ</span>
           </motion.div>
         )}
       </motion.div>
@@ -366,56 +367,64 @@ export default function HomePage() {
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           >
             <motion.div
-              initial={{ scale: 0.9, y: 20 }}
+              initial={{ scale: 0.95, y: 10 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-white rounded-2xl border-4 border-primary-dark p-6 sm:p-8 max-w-lg w-full shadow-[8px_8px_0_#2D3436] relative overflow-hidden"
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-white rounded-2xl border-2 border-primary-dark p-6 max-w-lg w-full shadow-[6px_6px_0_#2D3436] relative overflow-hidden"
             >
               <button
                 onClick={() => setShowAIModeModal(false)}
                 className="absolute top-4 right-4 text-text-light hover:text-text-primary transition-colors"
                 title="Đóng"
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
 
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-4xl text-amber-500">🤖</span>
-                <h2 className="text-2xl font-black text-primary-dark">Chế Độ Ai Tutor</h2>
+              <div className="flex items-center gap-3 mb-5 border-b-2 border-border pb-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-black text-primary-dark">Chế Độ AI Tutor</h2>
               </div>
               
-              <div className="mb-6 text-text-secondary leading-relaxed space-y-3">
-                <p>
-                  Xin chào, cô là <strong className="text-primary">Tú AI</strong>. Khi em làm bài ở chế độ này, cô sẽ:
+              <div className="mb-6 text-text-primary leading-relaxed space-y-4">
+                <p className="text-sm font-semibold">
+                  Hệ thống AI sẽ đồng hành và hướng dẫn bạn trong suốt quá trình làm bài:
                 </p>
-                <ul className="list-disc leading-relaxed text-sm ml-5 pl-2">
-                  <li>Nghiêm khắc phát hiện các <b>lỗi diễn đạt ngớ ngẩn</b> (ngữ pháp, chính tả).</li>
-                  <li>Nếu để câu dài quá 50 chữ không ngắt nghỉ, cô sẽ <b>gạch chân nhắc nhở</b> ngay.</li>
-                  <li>Di chuyển dàn ý linh hoạt theo mạch viết, gợi ý "nên viết gì tiếp theo" để <b>không bao giờ bí ý tưởng</b>.</li>
+                <ul className="list-disc text-sm ml-5 pl-1 space-y-2 text-text-secondary">
+                  <li>Phát hiện tức thời các <b>lỗi diễn đạt, ngữ pháp, và chính tả</b>.</li>
+                  <li>Nhắc nhở ngay lập tức nếu bạn viết câu <b>quá dài (trên 50 chữ)</b> thiếu ngắt nghỉ.</li>
+                  <li>Phân tích mạch văn và <b>gợi ý ý tưởng tiếp theo</b> để bạn không bao giờ bị bí từ.</li>
                 </ul>
-                <p className="mt-4 text-xs italic text-amber-700 bg-amber-50 p-3 rounded-lg border border-amber-200">
-                  <strong className="text-amber-800 uppercase block mb-1">Cảnh Báo Nho Nhỏ:</strong>
-                  Tuy nhiên, vì đây là chế độ Luyện Tập, kết quả bài thi này sẽ <b>KHÔNG</b> được lưu vào hồ sơ học bạ (Thống Kê, Top Điểm, v.v) nhằm duy trì bảng xếp hạng công bằng nhé.
-                </p>
+                <div className="mt-4 text-xs text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-start gap-2">
+                  <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <p>
+                    <b>Lưu ý:</b> Đây là chế độ Luyện tập. Nhằm duy trì tính công bằng, kết quả của bạn sẽ <b>không</b> được lưu vào hồ sơ cá nhân hay bảng xếp hạng.
+                  </p>
+                </div>
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6">
                 <button
                   onClick={() => setShowAIModeModal(false)}
-                  className="px-5 py-2.5 rounded-xl border-2 border-border text-text-secondary font-bold hover:bg-gray-50 transition-all font-quicksand"
+                  className="px-5 py-2.5 rounded-xl border-2 border-border text-text-secondary font-bold hover:bg-gray-50 hover:text-text-primary transition-all text-sm"
                 >
-                  <span className="text-lg">Từ Chối</span>
+                  Huỷ bỏ
                 </button>
                 <button
                   onClick={() => {
                     setIsAIMode(true);
                     setShowAIModeModal(false);
                   }}
-                  className="px-5 py-2.5 bg-primary rounded-xl border-2 border-primary-dark text-white font-black shadow-[4px_4px_0_#2D3436] hover:-translate-y-1 transition-all"
+                  className="px-5 py-2.5 bg-primary rounded-xl border-2 border-primary-dark text-white font-black hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#2D3436] transition-all text-sm"
                 >
-                  <span className="text-lg">Đồng Ý ! Bật Lên Nào</span>
+                  Bật AI Tutor
                 </button>
               </div>
             </motion.div>
@@ -433,10 +442,10 @@ export default function HomePage() {
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           >
             <motion.div
-              initial={{ scale: 0.9, y: 20 }}
+              initial={{ scale: 0.95, y: 10 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-white rounded-2xl border-4 border-primary-dark p-6 sm:p-8 max-w-sm w-full shadow-[8px_8px_0_#2D3436] relative text-center"
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-white rounded-2xl border-2 border-primary-dark p-6 sm:p-8 max-w-sm w-full shadow-[6px_6px_0_#2D3436] relative text-center"
             >
               <button
                 onClick={() => {
@@ -446,23 +455,27 @@ export default function HomePage() {
                 className="absolute top-4 right-4 text-text-light hover:text-text-primary transition-colors"
                 title="Đóng"
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
 
-              <div className="text-6xl mb-4">🔐</div>
-              <h2 className="text-xl font-black text-primary-dark mb-2">Bạn Cần Đăng Nhập</h2>
-              <p className="text-sm text-text-secondary mb-6">
-                Vui lòng đăng nhập để bắt đầu làm bài và lưu lại kết quả thi của bạn nhé!
+              <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20 mb-5">
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-black text-primary-dark mb-2">Đăng Nhập</h2>
+              <p className="text-sm text-text-secondary mb-6 leading-relaxed">
+                Vui lòng đăng nhập để bắt đầu làm bài và lưu lại kết quả thi của bạn.
               </p>
 
               <button
                 onClick={handleLogin}
-                className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white text-gray-800 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:shadow-[4px_4px_0_#2D3436] hover:-translate-y-1 transition-all font-bold"
+                className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white text-gray-800 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-primary hover:shadow-[3px_3px_0_#DFE6E9] hover:-translate-y-0.5 transition-all font-bold text-sm"
               >
                 <FcGoogle className="w-5 h-5" />
-                Đăng nhập bằng Google
+                Tiếp tục với Google
               </button>
             </motion.div>
           </motion.div>

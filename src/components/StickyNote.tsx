@@ -41,7 +41,7 @@ export default function StickyNote({ message = "", weaknesses = [], onConfirm, c
           animate={{ x: 0, opacity: 1, scale: 1 }}
           exit={{ x: 100, opacity: 0, scale: 0.8 }}
           transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-          className="fixed bottom-6 right-6 z-40 max-w-sm"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-[calc(100vw-2rem)] sm:w-80 max-w-sm"
         >
           <div className="relative">
             {/* Sticky note card */}

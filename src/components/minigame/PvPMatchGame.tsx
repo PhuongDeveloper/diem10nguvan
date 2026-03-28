@@ -80,7 +80,8 @@ export default function PvPMatchGame() {
 
       // Game data is ready, start playing
       if (data.gameData && data.status === 'playing' && phase === 'loading') {
-        const pairs = data.gameData as Pair[];
+        const pairsRaw = Array.isArray(data.gameData) ? data.gameData : Object.values(data.gameData);
+        const pairs = pairsRaw as Pair[];
         setTotalPairs(pairs.length);
         setMatchedCount(0);
         

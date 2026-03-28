@@ -77,8 +77,17 @@ export default function PvPQuizGame() {
       setMatchData(data);
 
       if (data.gameData && data.status === 'playing' && phase === 'loading') {
-        const qs = data.gameData as QuizQuestion[];
-        setQuestions(qs);
+        // Firebase RTDB may convert arrays to objects, so ensure it's an array
+        const qs = (Array.isArray(data.gameData) ? data.gameData : Object.values(data.gameData)) as any[];
+        
+        // Normalize the questions to ensure they have an options array
+        const normalizedQs: QuizQuestion[] = qs.map(q => ({
+          question: q.question || 'Câu hỏi lỗi?',
+          options: q.options || q.choices || q.answers || ['A', 'B', 'C', 'D'],
+          correct: q.correct !== undefined ? q.correct : 0,
+        }));
+        
+        setQuestions(normalizedQs);
         setCurrentIndex(0);
         setScore(0);
         setPhase('playing');
@@ -325,7 +334,7 @@ export default function PvPQuizGame() {
 
       {/* Options */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {currentQ.options.map((opt, i) => (
+        {(currentQ?.options || []).map((opt, i) => (
           <button
             key={i}
             onClick={() => handleAnswer(i)}

@@ -165,6 +165,10 @@ export default function HomePage() {
 
   const grades = [
     { key: 'all' as const, label: 'Tất cả' },
+    { key: 6 as const, label: 'Lớp 6' },
+    { key: 7 as const, label: 'Lớp 7' },
+    { key: 8 as const, label: 'Lớp 8' },
+    { key: 9 as const, label: 'Lớp 9' },
     { key: 10 as const, label: 'Lớp 10' },
     { key: 11 as const, label: 'Lớp 11' },
     { key: 12 as const, label: 'Lớp 12' },

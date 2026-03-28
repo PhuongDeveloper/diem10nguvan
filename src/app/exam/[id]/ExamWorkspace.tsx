@@ -23,6 +23,8 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
   const [weaknessHistory, setWeaknessHistory] = useState<string[]>([]);
   const [showResult, setShowResult] = useState(false);
 
+  const ANTI_CHEAT_ENABLED = false; // Toggle this to true to enable anti-cheat features
+
   // Exam constraints state
   const [isStarted, setIsStarted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120 * 60); // 120 minutes in seconds
@@ -68,23 +70,29 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
     // Anti copy/paste/right click
     const blockEvent = (e: Event) => e.preventDefault();
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('contextmenu', blockEvent);
-    document.addEventListener('copy', blockEvent);
-    document.addEventListener('paste', blockEvent);
+    if (ANTI_CHEAT_ENABLED) {
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+      document.addEventListener('contextmenu', blockEvent);
+      document.addEventListener('copy', blockEvent);
+      document.addEventListener('paste', blockEvent);
+    }
 
     return () => {
       clearInterval(timerId);
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('contextmenu', blockEvent);
-      document.removeEventListener('copy', blockEvent);
-      document.removeEventListener('paste', blockEvent);
+      if (ANTI_CHEAT_ENABLED) {
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('contextmenu', blockEvent);
+        document.removeEventListener('copy', blockEvent);
+        document.removeEventListener('paste', blockEvent);
+      }
     };
   }, [isStarted, showResult, isSubmitting]);
 
   const startExam = async () => {
     try {
-      await document.documentElement.requestFullscreen();
+      if (ANTI_CHEAT_ENABLED) {
+        await document.documentElement.requestFullscreen();
+      }
       setIsStarted(true);
       setStartTime(Date.now());
       setTimeLeft(120 * 60);
@@ -222,6 +230,23 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
         highestScore: newHighest,
         status: newHighest >= 8 ? 'green' : newHighest >= 5 ? 'yellow' : 'red',
         updatedAt: serverTimestamp()
+      });
+
+      // Save the full submission for admin review
+      const submissionRef = doc(db, 'submissions', `${user.uid}_${exam.id}`);
+      await setDoc(submissionRef, {
+        examId: exam.id,
+        examTitle: exam.title,
+        userId: user.uid,
+        userName: user.displayName || 'Ẩn danh',
+        userEmail: user.email || '',
+        userPhoto: user.photoURL || '',
+        submissionType: data.type,
+        submissionText: data.type === 'text' ? text : null,
+        submissionImageUrl: data.type === 'image' ? imageUrl : null,
+        score: score,
+        gradeResult: scoreResult,
+        submittedAt: serverTimestamp()
       });
 
       // 5. Update overall user stats

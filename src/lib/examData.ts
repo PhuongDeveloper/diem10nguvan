@@ -12,7 +12,7 @@ export interface ExamInfo {
 // Read the public/dethi folder dynamically
 export function scanExams(): ExamInfo[] {
   const exams: ExamInfo[] = [];
-  const grades = [10, 11, 12];
+  const grades = [6, 7, 8, 9, 10, 11, 12];
   
   // Need to handle paths correctly when running in Next.js
   const publicDir = path.join(process.cwd(), 'public');

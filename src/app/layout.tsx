@@ -3,6 +3,7 @@ import { Quicksand } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
+import ChallengeNotification from "@/components/ChallengeNotification";
 
 const quicksand = Quicksand({
   subsets: ["latin", "vietnamese"],
@@ -11,7 +12,7 @@ const quicksand = Quicksand({
 });
 
 export const metadata: Metadata = {
-  title: "Thi Văn Quán - Luyện thi Ngữ Văn cùng AI",
+  title: "Ngữ văn số hoá - Luyện thi Ngữ Văn cùng AI",
   description:
     "Nền tảng luyện thi môn Ngữ Văn tích hợp AI. Chấm bài tự động, phân tích điểm yếu, minigame ôn tập hấp dẫn.",
   keywords: ["ngữ văn", "luyện thi", "AI", "chấm bài", "học sinh"],
@@ -29,6 +30,7 @@ export default function RootLayout({
           {/* Animated background blobs */}
           <div className="blob-bg" />
           <Navbar />
+          <ChallengeNotification />
           <main className="min-h-[calc(100vh-72px)]">{children}</main>
         </AuthProvider>
       </body>

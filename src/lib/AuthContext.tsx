@@ -46,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: firebaseUser.email || '',
             totalScore: 0,
             examsDone: 0,
+            stars: 0,
             createdAt: serverTimestamp(),
           });
         }

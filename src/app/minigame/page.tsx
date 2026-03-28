@@ -1,22 +1,43 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, Suspense } from 'react';
+import { motion } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
 import FlashCardGame from '@/components/minigame/FlashCardGame';
 import MatchGame from '@/components/minigame/MatchGame';
 import SpeedQuizGame from '@/components/minigame/SpeedQuizGame';
+import PvPMatchGame from '@/components/minigame/PvPMatchGame';
+import PvPQuizGame from '@/components/minigame/PvPQuizGame';
 
-export default function MinigamePage() {
-  const [activeTab, setActiveTab] = useState<'flashcard' | 'match' | 'quiz'>('flashcard');
+type TabId = 'flashcard' | 'match' | 'quiz' | 'pvp-match' | 'pvp-quiz';
 
-  const TABS = [
-    { id: 'flashcard' as const, label: 'Lật Thẻ Ôn Tập', icon: '🎴' },
-    { id: 'match' as const, label: 'Nối Khái Niệm', icon: '🔗' },
-    { id: 'quiz' as const, label: 'Trắc Nghiệm', icon: '⚡' },
+function MinigameContent() {
+  const searchParams = useSearchParams();
+  const pvpParam = searchParams.get('pvp');
+
+  const [activeTab, setActiveTab] = useState<TabId>('flashcard');
+
+  useEffect(() => {
+    if (pvpParam === 'match') {
+      setActiveTab('pvp-match');
+    } else if (pvpParam === 'quiz') {
+      setActiveTab('pvp-quiz');
+    }
+  }, [pvpParam]);
+
+  const SOLO_TABS = [
+    { id: 'flashcard' as const, label: 'Lật Thẻ Ôn Tập' },
+    { id: 'match' as const, label: 'Nối Khái Niệm' },
+    { id: 'quiz' as const, label: 'Trắc Nghiệm' },
+  ];
+
+  const PVP_TABS = [
+    { id: 'pvp-match' as const, label: 'Nối Khái Niệm PvP' },
+    { id: 'pvp-quiz' as const, label: 'Trắc Nghiệm PvP' },
   ];
 
   return (
-    <div className="min-h-[calc(100vh-72px)] bg-bg-main py-10 px-4 sm:px-6 lg:px-8">
+    <>
       <div className="max-w-4xl mx-auto mb-10 text-center">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -35,20 +56,47 @@ export default function MinigamePage() {
         </motion.div>
       </div>
 
-      <div className="max-w-4xl mx-auto mb-10 flex flex-wrap justify-center gap-2 sm:gap-4">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-3 sm:px-6 py-2 sm:py-3 rounded-xl border-2 font-bold text-xs sm:text-sm transition-all flex items-center gap-1.5 sm:gap-2 ${activeTab === tab.id
-                ? 'bg-primary border-primary-dark text-white shadow-[4px_4px_0_#2D3436] -translate-y-1'
-                : 'bg-white border-border text-text-secondary hover:border-primary hover:text-primary'
-              }`}
-          >
-            <span className="text-base sm:text-lg shrink-0">{tab.icon}</span>
-            <span className="truncate">{tab.label}</span>
-          </button>
-        ))}
+      {/* Tab Groups */}
+      <div className="max-w-4xl mx-auto mb-10">
+        {/* Solo Mode Tabs */}
+        <div className="mb-3">
+          <p className="text-xs font-bold text-text-light uppercase tracking-wider mb-2 ml-1">Chơi đơn</p>
+          <div className="flex flex-wrap gap-2">
+            {SOLO_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl border-2 font-bold text-xs sm:text-sm transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-primary border-primary-dark text-white shadow-[3px_3px_0_#2D3436] -translate-y-0.5'
+                    : 'bg-white border-border text-text-secondary hover:border-primary hover:text-primary'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* PvP Mode Tabs */}
+        <div>
+          <p className="text-xs font-bold text-text-light uppercase tracking-wider mb-2 ml-1">Đối kháng (PvP)</p>
+          <div className="flex flex-wrap gap-2">
+            {PVP_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl border-2 font-bold text-xs sm:text-sm transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-red-500 border-red-800 text-white shadow-[3px_3px_0_#991B1B] -translate-y-0.5'
+                    : 'bg-white border-border text-text-secondary hover:border-red-400 hover:text-red-500'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <motion.div
@@ -61,7 +109,23 @@ export default function MinigamePage() {
         {activeTab === 'flashcard' && <FlashCardGame />}
         {activeTab === 'match' && <MatchGame />}
         {activeTab === 'quiz' && <SpeedQuizGame />}
+        {activeTab === 'pvp-match' && <PvPMatchGame />}
+        {activeTab === 'pvp-quiz' && <PvPQuizGame />}
       </motion.div>
+    </>
+  );
+}
+
+export default function MinigamePage() {
+  return (
+    <div className="min-h-[calc(100vh-72px)] bg-bg-main py-10 px-4 sm:px-6 lg:px-8">
+      <Suspense fallback={
+        <div className="max-w-4xl mx-auto text-center py-16">
+          <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto" />
+        </div>
+      }>
+        <MinigameContent />
+      </Suspense>
     </div>
   );
 }

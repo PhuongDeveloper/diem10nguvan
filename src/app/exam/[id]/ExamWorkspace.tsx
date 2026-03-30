@@ -23,7 +23,7 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
   const [weaknessHistory, setWeaknessHistory] = useState<string[]>([]);
   const [showResult, setShowResult] = useState(false);
 
-  const ANTI_CHEAT_ENABLED = true; // Toggle this to true to enable anti-cheat features
+  const ANTI_CHEAT_ENABLED = false; // Toggle this to true to enable anti-cheat features
 
   // Exam constraints state
   const [isStarted, setIsStarted] = useState(false);
@@ -324,8 +324,8 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
           <button
             onClick={startExam}
             className={`w-full px-8 py-3.5 text-white text-lg font-black rounded-xl border-2 shadow-[4px_4px_0_#2D3436] hover:translate-y-[-2px] transition-transform ${isAIMode
-                ? 'bg-amber-500 border-amber-800'
-                : 'bg-primary border-primary-dark'
+              ? 'bg-amber-500 border-amber-800'
+              : 'bg-primary border-primary-dark'
               }`}
           >
             {isAIMode ? 'BẮT ĐẦU LUYỆN TẬP' : 'BẮT ĐẦU VÀO THI'}

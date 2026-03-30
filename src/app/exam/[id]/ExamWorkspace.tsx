@@ -23,7 +23,7 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
   const [weaknessHistory, setWeaknessHistory] = useState<string[]>([]);
   const [showResult, setShowResult] = useState(false);
 
-  const ANTI_CHEAT_ENABLED = false; // Toggle this to true to enable anti-cheat features
+  const ANTI_CHEAT_ENABLED = true; // Toggle this to true to enable anti-cheat features
 
   // Exam constraints state
   const [isStarted, setIsStarted] = useState(false);
@@ -294,18 +294,15 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className={`bg-white p-8 rounded-2xl border-4 shadow-[8px_8px_0_#2D3436] max-w-md text-center ${
-            isAIMode ? 'border-amber-500' : 'border-primary-dark'
-          }`}
+          className={`bg-white p-8 rounded-2xl border-4 shadow-[8px_8px_0_#2D3436] max-w-md text-center ${isAIMode ? 'border-amber-500' : 'border-primary-dark'
+            }`}
         >
-          <div className={`w-20 h-20 mx-auto text-white rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner border-4 ${
-            isAIMode ? 'bg-amber-400 border-amber-700' : 'bg-primary border-primary-dark'
-          }`}>
+          <div className={`w-20 h-20 mx-auto text-white rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner border-4 ${isAIMode ? 'bg-amber-400 border-amber-700' : 'bg-primary border-primary-dark'
+            }`}>
             {isAIMode ? '📖' : '📝'}
           </div>
-          <h2 className={`text-2xl font-black mb-4 drop-shadow-[2px_2px_0_#FDCB6E] ${
-            isAIMode ? 'text-amber-700' : 'text-primary-dark'
-          }`}>
+          <h2 className={`text-2xl font-black mb-4 drop-shadow-[2px_2px_0_#FDCB6E] ${isAIMode ? 'text-amber-700' : 'text-primary-dark'
+            }`}>
             {isAIMode ? 'Chế Độ Luyện Tập Với AI' : 'Chuẩn Bị Làm Bài'}
           </h2>
           <div className="text-text-secondary mb-6 space-y-2 text-sm text-left bg-gray-50 p-4 border-2 border-border rounded-xl">
@@ -326,11 +323,10 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
           </div>
           <button
             onClick={startExam}
-            className={`w-full px-8 py-3.5 text-white text-lg font-black rounded-xl border-2 shadow-[4px_4px_0_#2D3436] hover:translate-y-[-2px] transition-transform ${
-              isAIMode
+            className={`w-full px-8 py-3.5 text-white text-lg font-black rounded-xl border-2 shadow-[4px_4px_0_#2D3436] hover:translate-y-[-2px] transition-transform ${isAIMode
                 ? 'bg-amber-500 border-amber-800'
                 : 'bg-primary border-primary-dark'
-            }`}
+              }`}
           >
             {isAIMode ? 'BẮT ĐẦU LUYỆN TẬP' : 'BẮT ĐẦU VÀO THI'}
           </button>

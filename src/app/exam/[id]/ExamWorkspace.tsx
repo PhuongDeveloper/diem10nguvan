@@ -23,7 +23,7 @@ export default function ExamWorkspace({ exam }: { exam: ExamInfo }) {
   const [weaknessHistory, setWeaknessHistory] = useState<string[]>([]);
   const [showResult, setShowResult] = useState(false);
 
-  const ANTI_CHEAT_ENABLED = false; // Toggle this to true to enable anti-cheat features
+  const ANTI_CHEAT_ENABLED = true; // Toggle this to true to enable anti-cheat features
 
   // Exam constraints state
   const [isStarted, setIsStarted] = useState(false);

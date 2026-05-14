@@ -69,7 +69,7 @@ export default function AdminPage() {
       alert('Điểm phải từ 0 đến 10');
       return;
     }
-    
+
     if (!confirm(`Bạn có chắc muốn sửa điểm của học sinh ${submission.userName} thành ${editingScore}?`)) return;
 
     setIsSavingScore(true);
@@ -88,8 +88,8 @@ export default function AdminPage() {
         let newHighest = udata.highestScore;
         // If we are raising the score above current highest, or lowering it (and it was the only attempt)
         // Since we only store 1 submission per exam per user in this simple system, highestScore equals this score
-        newHighest = editingScore; 
-        await setDoc(progRef, { 
+        newHighest = editingScore;
+        await setDoc(progRef, {
           highestScore: newHighest,
           status: newHighest >= 8 ? 'green' : newHighest >= 5 ? 'yellow' : 'red'
         }, { merge: true });
@@ -111,7 +111,7 @@ export default function AdminPage() {
       setSelectedSubmissionId(null); // Go back to student list
     } catch (err) {
       console.error(err);
-      alert('Lỗi cập nhật điểm!');
+      alert('Lỗi cập nhật điểm');
     } finally {
       setIsSavingScore(false);
       setEditingScore(null);
@@ -150,7 +150,7 @@ export default function AdminPage() {
       if (!examsMap.has(s.examId)) examsMap.set(s.examId, { title: s.examTitle, count: 0 });
       examsMap.get(s.examId)!.count++;
     });
-    
+
     const exams = Array.from(examsMap.entries()).map(([id, data]) => ({ id, ...data }));
 
     return (
@@ -200,7 +200,7 @@ export default function AdminPage() {
         <button onClick={() => setSelectedExamId(null)} className="mb-6 px-4 py-2 bg-white border-2 border-border text-text-secondary font-bold rounded-xl hover:bg-gray-50 flex items-center gap-2">
           ← Quay lại danh sách đề
         </button>
-        
+
         <h2 className="text-2xl font-black text-primary-dark mb-6">Đề: {examTitle}</h2>
 
         <div className="bg-white rounded-2xl border-4 border-primary-dark shadow-[8px_8px_0_#2D3436] overflow-hidden">
@@ -230,7 +230,7 @@ export default function AdminPage() {
                     <td className="p-4 font-black text-primary">{s.score}</td>
                     <td className="p-4 text-xs text-text-secondary">{date.toLocaleString('vi-VN')}</td>
                     <td className="p-4">
-                      <button 
+                      <button
                         onClick={() => setSelectedSubmissionId(s.id)}
                         className="px-4 py-1.5 bg-white border-2 border-primary text-primary font-bold rounded-lg hover:bg-primary hover:text-white transition-colors text-sm"
                       >
@@ -264,7 +264,7 @@ export default function AdminPage() {
             <h3 className="text-xl font-black text-primary-dark mb-4 border-b-2 border-border pb-2">
               Bài làm của: {currentSub.userName}
             </h3>
-            
+
             {currentSub.submissionType === 'image' && currentSub.submissionImageUrl ? (
               <div className="border border-gray-200 rounded-xl overflow-hidden bg-gray-50 p-2">
                 <img src={currentSub.submissionImageUrl} alt="Bài làm" className="w-full h-auto object-contain max-h-[600px] rounded-lg border border-gray-200" />
@@ -311,7 +311,7 @@ export default function AdminPage() {
           {/* AI Feedback View */}
           <div className="bg-white rounded-2xl border-4 border-primary-dark shadow-[6px_6px_0_#2D3436] p-6">
             <h3 className="text-lg font-black text-primary-dark mb-4 pb-2 border-b-2 border-border">Chi tiết đánh giá của AI</h3>
-            
+
             <div className="space-y-4">
               {currentSub.gradeResult?.chi_tiet_diem?.map((item, index) => (
                 <div key={index} className="border-l-4 border-primary pl-3">
@@ -329,8 +329,8 @@ export default function AdminPage() {
                 ))}
               </ul>
             </div>
-            
-             <div className="mt-4 pt-4 border-t border-gray-100">
+
+            <div className="mt-4 pt-4 border-t border-gray-100">
               <h4 className="font-bold text-primary mb-2">Lời khuyên:</h4>
               <p className="text-sm text-gray-700">{currentSub.gradeResult?.sticky_note}</p>
             </div>

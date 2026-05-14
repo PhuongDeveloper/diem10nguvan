@@ -1,0 +1,30 @@
+[
+  {
+    "id": "lop12-1",
+    "grade": 12,
+    "title": "Đề 1",
+    "dethiPath": "/dethi/lop12/1.docx",
+    "huongdanchamPath": "/huongdancham/lop12/1.docx"
+  },
+  {
+    "id": "lop12-2",
+    "grade": 12,
+    "title": "Đề 2",
+    "dethiPath": "/dethi/lop12/2.docx",
+    "huongdanchamPath": "/huongdancham/lop12/2.docx"
+  },
+  {
+    "id": "lop12-3",
+    "grade": 12,
+    "title": "Đề 3",
+    "dethiPath": "/dethi/lop12/3.docx",
+    "huongdanchamPath": "/huongdancham/lop12/3.docx"
+  },
+  {
+    "id": "lop12-4",
+    "grade": 12,
+    "title": "Đề 4",
+    "dethiPath": "/dethi/lop12/4.docx",
+    "huongdanchamPath": "/huongdancham/lop12/4.docx"
+  }
+]

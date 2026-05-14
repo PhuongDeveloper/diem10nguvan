@@ -1,5 +1,12 @@
+// ============================================================
+// /api/check-answer — API kiểm tra câu trả lời đọc hiểu
+// ============================================================
+// LUỒNG CŨ (Gemini): model.generateContent(prompt)
+// LUỒNG MỚI (DeepSeek): callDeepSeekAPI(prompt) → extractJSON()
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { callDeepSeekAPI, extractJSON } from '@/lib/deepseek';
 
 export interface AnswerCheck {
   questionLabel: string;
@@ -14,14 +21,6 @@ export async function POST(request: NextRequest) {
     if (!studentAnswer?.trim() || !questionText?.trim()) {
       return NextResponse.json({ success: false, error: 'Thiếu dữ liệu' }, { status: 400 });
     }
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: 'API key không tồn tại' }, { status: 500 });
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `Bạn là giáo viên Ngữ Văn THPT chấm câu hỏi đọc hiểu nhanh.
 
@@ -40,13 +39,12 @@ Hãy đánh giá câu trả lời này. Trả về JSON thuần túy (không có
   "feedback": "nhận xét ngắn gọn 1-2 câu bằng tiếng Việt, nếu sai thì gợi ý hướng trả lời đúng"
 }`;
 
-    const result = await model.generateContent(prompt);
-    let responseText = result.response.text().trim();
-    responseText = responseText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    // [MỚI] Gọi DeepSeek thay vì Gemini
+    const responseText = await callDeepSeekAPI(prompt);
 
     let checkResult: { isCorrect: boolean; feedback: string };
     try {
-      checkResult = JSON.parse(responseText);
+      checkResult = extractJSON(responseText) as { isCorrect: boolean; feedback: string };
     } catch {
       checkResult = { isCorrect: false, feedback: 'Không thể đánh giá tự động, hãy xem lại câu trả lời.' };
     }
@@ -54,6 +52,9 @@ Hãy đánh giá câu trả lời này. Trả về JSON thuần túy (không có
     return NextResponse.json({ success: true, ...checkResult });
   } catch (error) {
     console.error('Check answer error:', error);
-    return NextResponse.json({ error: 'Lỗi kiểm tra câu trả lời' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Lỗi kiểm tra câu trả lời', details: error instanceof Error ? error.message : 'Unknown' },
+      { status: 500 }
+    );
   }
 }

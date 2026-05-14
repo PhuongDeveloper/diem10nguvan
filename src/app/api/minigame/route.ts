@@ -1,17 +1,22 @@
+// ============================================================
+// /api/minigame — API tạo dữ liệu minigame (flashcard, match, quiz)
+// ============================================================
+// LUỒNG CŨ (Gemini — ĐÃ LOẠI BỎ):
+//   - Dùng @google/generative-ai SDK → model.generateContent(prompt)
+//   - Parse: result.response.text()
+//
+// LUỒNG MỚI (DeepSeek — OpenAI Compatible):
+//   - Gọi callDeepSeekAPI() từ @/lib/deepseek
+//   - Parse: choices[0].message.content (đã xử lý bên trong helper)
+//   - Bảo vệ: try-catch + timeout + log lỗi rõ ràng
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { callDeepSeekAPI, extractJSON } from '@/lib/deepseek';
 
 export async function POST(request: NextRequest) {
   try {
     const { type } = await request.json(); // 'flashcard', 'match', 'quiz'
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: 'API key không tồn tại' }, { status: 500 });
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     let prompt = '';
     if (type === 'flashcard') {
@@ -31,15 +36,19 @@ BẮT BUỘC trả về JSON mảng thuần túy:
       return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }
 
-    const result = await model.generateContent(prompt);
-    let responseText = result.response.text().trim();
-    responseText = responseText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-
-    const data = JSON.parse(responseText);
+    // [MỚI] Gọi DeepSeek thay vì Gemini
+    const responseText = await callDeepSeekAPI(prompt);
+    const data = extractJSON(responseText);
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('Minigame API error:', error);
-    return NextResponse.json({ error: 'Lỗi tạo dữ liệu minigame' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Lỗi tạo dữ liệu minigame',
+        details: error instanceof Error ? error.message : 'Unknown',
+      },
+      { status: 500 }
+    );
   }
 }

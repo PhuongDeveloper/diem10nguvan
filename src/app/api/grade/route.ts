@@ -1,11 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// ============================================================
+// /api/grade — API chấm bài Ngữ Văn (text hoặc ảnh)
+// ============================================================
+// LUỒNG CŨ (Gemini): model.generateContent() — hỗ trợ multimodal (text + ảnh)
+// LUỒNG MỚI (DeepSeek): callDeepSeekAPI() — chỉ hỗ trợ text
+//   → Với bài làm dạng text: gọi DeepSeek bình thường
+//   → Với bài làm dạng ảnh: trả về lỗi yêu cầu nhập text thay vì ảnh
+//     (DeepSeek text-only không hỗ trợ phân tích ảnh)
+// ============================================================
 
-/**
- * API Route: AI Grading using Gemini 2.5 Flash
- * Receives student answer (text or image URL), grading guide content,
- * and user weakness history, returns structured grading result.
- */
+import { NextRequest, NextResponse } from 'next/server';
+import { callDeepSeekAPI, extractJSON } from '@/lib/deepseek';
 
 const SYSTEM_PROMPT = `Bạn là một giáo viên chấm thi Ngữ Văn THPT cực kỳ khắt khe và công minh. Nhiệm vụ của bạn là chấm bài làm của học sinh dựa trên Hướng dẫn chấm được cung cấp.
 
@@ -13,8 +17,7 @@ QUY TẮC CHẤM:
 1. ĐIỂM TỐI ĐA là 9.5/10. Không bao giờ cho 10 điểm trừ khi bài hoàn hảo tuyệt đối.
 2. So khớp chặt chẽ với Hướng dẫn chấm. Thiếu ý = trừ điểm tương ứng.
 3. Đánh giá cả nội dung lẫn diễn đạt (lỗi chính tả, ngữ pháp, diễn đạt lủng củng).
-4. Nếu bài làm là ảnh chụp chữ viết tay: KHÔNG trừ điểm vì lỗi OCR (nhận dạng sai chữ). Chỉ trừ nếu thực sự viết sai.
-5. Khen ngợi những điểm tốt, nhưng phải thẳng thắn chỉ ra lỗi.
+4. Khen ngợi những điểm tốt, nhưng phải thẳng thắn chỉ ra lỗi.
 
 BẮT BUỘC trả về JSON với cấu trúc sau (KHÔNG kèm markdown code block, chỉ trả JSON thuần):
 {
@@ -49,77 +52,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
+    // DeepSeek text-only không hỗ trợ phân tích ảnh
+    if (!text && imageUrl) {
       return NextResponse.json(
-        { error: 'Gemini API key chưa được cấu hình' },
-        { status: 500 }
+        {
+          error: 'Hiện tại chức năng chấm bài từ ảnh đang bảo trì. Vui lòng nhập bài làm bằng text.',
+        },
+        { status: 400 }
       );
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
-    // Build the prompt
-    let userPrompt = `HƯỚNG DẪN CHẤM:\n${guidanceContent || 'Không có hướng dẫn chấm cụ thể. Hãy chấm theo tiêu chuẩn chung của môn Ngữ Văn THPT.'}\n\n`;
+    // Build prompt cho DeepSeek
+    let userPrompt = `${SYSTEM_PROMPT}\n\nHƯỚNG DẪN CHẤM:\n${guidanceContent || 'Không có hướng dẫn chấm cụ thể. Hãy chấm theo tiêu chuẩn chung của môn Ngữ Văn THPT.'}\n\n`;
 
     if (weaknesses && weaknesses.length > 0) {
       userPrompt += `LỊCH SỬ ĐIỂM YẾU CỦA HỌC SINH:\n${weaknesses.join(', ')}\n\n`;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const parts: any[] = [];
+    userPrompt += `BÀI LÀM CỦA HỌC SINH (đánh máy):\n${text}`;
 
-    if (text) {
-      userPrompt += `BÀI LÀM CỦA HỌC SINH (đánh máy):\n${text}`;
-      parts.push({ text: userPrompt });
-    } else if (imageUrl) {
-      userPrompt += `BÀI LÀM CỦA HỌC SINH (ảnh chụp bài viết tay - xem hình đính kèm):`;
-      parts.push({ text: userPrompt });
+    // [MỚI] Gọi DeepSeek thay vì Gemini
+    const responseText = await callDeepSeekAPI(userPrompt);
 
-      // Fetch the image and convert to inline data
-      const imageResponse = await fetch(imageUrl);
-      const imageBuffer = await imageResponse.arrayBuffer();
-      const base64 = Buffer.from(imageBuffer).toString('base64');
-      const mimeType = imageResponse.headers.get('content-type') || 'image/jpeg';
-
-      parts.push({
-        inlineData: {
-          mimeType,
-          data: base64,
-        },
-      });
-    }
-
-    // Call Gemini API
-    const result = await model.generateContent({
-      systemInstruction: SYSTEM_PROMPT,
-      contents: [{ role: 'user', parts }],
-    });
-
-    const responseText = result.response.text();
-
-    // Parse JSON from response (handle potential markdown wrapping)
-    let gradeResult;
-    try {
-      // Try direct parse first
-      gradeResult = JSON.parse(responseText);
-    } catch {
-      // Try extracting JSON from markdown code block
-      const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)```/);
-      if (jsonMatch) {
-        gradeResult = JSON.parse(jsonMatch[1].trim());
-      } else {
-        // Try finding JSON object in the response
-        const jsonStart = responseText.indexOf('{');
-        const jsonEnd = responseText.lastIndexOf('}');
-        if (jsonStart !== -1 && jsonEnd !== -1) {
-          gradeResult = JSON.parse(responseText.slice(jsonStart, jsonEnd + 1));
-        } else {
-          throw new Error('Không thể parse kết quả từ AI');
-        }
-      }
-    }
+    // Parse JSON từ response
+    const gradeResult = extractJSON(responseText);
 
     return NextResponse.json({ success: true, result: gradeResult });
   } catch (error) {

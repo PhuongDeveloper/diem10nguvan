@@ -1,25 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// ============================================================
+// /api/quiz — API tạo câu hỏi trắc nghiệm cho Minigame
+// ============================================================
+// LUỒNG CŨ (Gemini): model.generateContent(prompt)
+// LUỒNG MỚI (DeepSeek): callDeepSeekAPI(prompt) → extractJSON()
+// ============================================================
 
-/**
- * API Route: Generate quiz questions for Minigame
- * Uses Gemini to create Vietnamese Literature trivia questions
- */
+import { NextRequest, NextResponse } from 'next/server';
+import { callDeepSeekAPI, extractJSON } from '@/lib/deepseek';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { topic, difficulty, askedQuestions } = body;
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'Gemini API key chưa được cấu hình' },
-        { status: 500 }
-      );
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     let avoidPrompt = '';
     if (askedQuestions && askedQuestions.length > 0) {
@@ -42,21 +34,9 @@ BẮT BUỘC trả về JSON (KHÔNG markdown):
   "explanation": "<giải thích>"
 }`;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-
-    let quizData;
-    try {
-      quizData = JSON.parse(responseText);
-    } catch {
-      const jsonStart = responseText.indexOf('{');
-      const jsonEnd = responseText.lastIndexOf('}');
-      if (jsonStart !== -1 && jsonEnd !== -1) {
-        quizData = JSON.parse(responseText.slice(jsonStart, jsonEnd + 1));
-      } else {
-        throw new Error('Cannot parse quiz data');
-      }
-    }
+    // [MỚI] Gọi DeepSeek thay vì Gemini
+    const responseText = await callDeepSeekAPI(prompt);
+    const quizData = extractJSON(responseText);
 
     return NextResponse.json({ success: true, quiz: quizData });
   } catch (error) {

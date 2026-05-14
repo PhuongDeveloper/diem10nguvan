@@ -1,5 +1,12 @@
+// ============================================================
+// /api/hint — API gợi ý viết bài cho học sinh
+// ============================================================
+// LUỒNG CŨ (Gemini): model.generateContent(prompt)
+// LUỒNG MỚI (DeepSeek): callDeepSeekAPI(prompt)
+// ============================================================
+
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { callDeepSeekAPI } from '@/lib/deepseek';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,14 +19,6 @@ export async function POST(request: NextRequest) {
         hint: 'Hãy bắt đầu viết bài của em nhé! Đọc kỹ đề trước khi bắt đầu.',
       });
     }
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: 'API key không tồn tại' }, { status: 500 });
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `Bạn là một giáo viên Ngữ Văn THPT đang theo dõi học sinh luyện tập. Hãy đóng vai như một "dàn ý di động" hướng dẫn học sinh viết đúng cấu trúc bài.
 
@@ -39,12 +38,15 @@ Ví dụ tốt: "Em đang ở phần thân bài nghị luận văn học. Mở b
 
 Chỉ trả về nội dung gợi ý, không có tiêu đề hay markdown. Dùng ngôi "em" và "cô".`;
 
-    const result = await model.generateContent(prompt);
-    const hint = result.response.text().trim();
+    // [MỚI] Gọi DeepSeek thay vì Gemini
+    const hint = await callDeepSeekAPI(prompt);
 
-    return NextResponse.json({ success: true, hint });
+    return NextResponse.json({ success: true, hint: hint.trim() });
   } catch (error) {
     console.error('Hint error:', error);
-    return NextResponse.json({ error: 'Lỗi tạo gợi ý' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Lỗi tạo gợi ý', details: error instanceof Error ? error.message : 'Unknown' },
+      { status: 500 }
+    );
   }
 }

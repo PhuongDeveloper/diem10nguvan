@@ -1,23 +1,30 @@
 // ============================================================
-// /api/minigame — API tạo dữ liệu minigame (flashcard, match, quiz)
+// /api/minigame — Luồng Gemini dùng cho tạo dữ liệu minigame
 // ============================================================
-// LUỒNG CŨ (Gemini — ĐÃ LOẠI BỎ):
-//   - Dùng @google/generative-ai SDK → model.generateContent(prompt)
-//   - Parse: result.response.text()
-//
-// LUỒNG MỚI (DeepSeek — OpenAI Compatible):
-//   - Gọi callDeepSeekAPI() từ @/lib/deepseek
-//   - Parse: choices[0].message.content (đã xử lý bên trong helper)
-//   - Bảo vệ: try-catch + timeout + log lỗi rõ ràng
+// Tính năng: Tạo flashcard, match pairs, quiz cho học sinh ôn tập
+// Luồng: Gemini SDK → model.generateContent(prompt)
+// Parse: result.response.text() → JSON.parse
+// Tương thích Frontend: route name + response format giữ nguyên
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { callDeepSeekAPI, extractJSON } from '@/lib/deepseek';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function POST(request: NextRequest) {
   try {
     const { type } = await request.json(); // 'flashcard', 'match', 'quiz'
 
+    // --- Kiểm tra API key Gemini ---
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'API key không tồn tại' }, { status: 500 });
+    }
+
+    // --- Khởi tạo Gemini ---
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    // --- Tạo prompt theo loại minigame ---
     let prompt = '';
     if (type === 'flashcard') {
       prompt = `Tạo 20 flashcard ngẫu nhiên về lý luận văn học, kỹ năng đọc hiểu, và phương pháp làm bài phân tích Ngữ Văn THPT (chương trình mới 2018). Ví dụ: thao tác lập luận, phương thức biểu đạt, các bước phân tích nhân vật, đặc trưng thể loại thơ, cấu tứ, v.v...
@@ -36,19 +43,21 @@ BẮT BUỘC trả về JSON mảng thuần túy:
       return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }
 
-    // [MỚI] Gọi DeepSeek thay vì Gemini
-    const responseText = await callDeepSeekAPI(prompt);
-    const data = extractJSON(responseText);
+    // --- Gọi Gemini API tạo văn bản ---
+    const result = await model.generateContent(prompt);
+    let responseText = result.response.text().trim();
 
+    // Loại bỏ markdown code block nếu có (```json ... ```)
+    responseText = responseText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    // --- Parse JSON từ response Gemini ---
+    const data = JSON.parse(responseText);
+
+    // --- Trả về cho Frontend (giữ nguyên format) ---
     return NextResponse.json({ success: true, data });
   } catch (error) {
+    // --- Xử lý lỗi: log + trả response lỗi, không crash server ---
     console.error('Minigame API error:', error);
-    return NextResponse.json(
-      {
-        error: 'Lỗi tạo dữ liệu minigame',
-        details: error instanceof Error ? error.message : 'Unknown',
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Lỗi tạo dữ liệu minigame' }, { status: 500 });
   }
 }

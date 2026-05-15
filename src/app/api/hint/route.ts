@@ -1,12 +1,14 @@
 // ============================================================
-// /api/hint — API gợi ý viết bài cho học sinh
+// /api/hint — Luồng Gemini dùng cho gợi ý viết bài
 // ============================================================
-// LUỒNG CŨ (Gemini): model.generateContent(prompt)
-// LUỒNG MỚI (DeepSeek): callDeepSeekAPI(prompt)
+// Tính năng: Gợi ý hướng viết bài cho học sinh trong lúc luyện tập
+// Luồng: Gemini SDK → model.generateContent(prompt)
+// Parse: result.response.text() (plain text, không cần parse JSON)
+// Tương thích Frontend: route name + response format giữ nguyên
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { callDeepSeekAPI } from '@/lib/deepseek';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,6 +22,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // --- Kiểm tra API key Gemini ---
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'API key không tồn tại' }, { status: 500 });
+    }
+
+    // --- Khởi tạo Gemini ---
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    // --- Tạo prompt ---
     const prompt = `Bạn là một giáo viên Ngữ Văn THPT đang theo dõi học sinh luyện tập. Hãy đóng vai như một "dàn ý di động" hướng dẫn học sinh viết đúng cấu trúc bài.
 
 HƯỚNG DẪN CHẤM (dàn ý tham khảo):
@@ -38,15 +51,15 @@ Ví dụ tốt: "Em đang ở phần thân bài nghị luận văn học. Mở b
 
 Chỉ trả về nội dung gợi ý, không có tiêu đề hay markdown. Dùng ngôi "em" và "cô".`;
 
-    // [MỚI] Gọi DeepSeek thay vì Gemini
-    const hint = await callDeepSeekAPI(prompt);
+    // --- Gọi Gemini API tạo văn bản ---
+    const result = await model.generateContent(prompt);
+    const hint = result.response.text().trim();
 
-    return NextResponse.json({ success: true, hint: hint.trim() });
+    // --- Trả về cho Frontend (giữ nguyên format) ---
+    return NextResponse.json({ success: true, hint });
   } catch (error) {
+    // --- Xử lý lỗi: log + trả response lỗi, không crash server ---
     console.error('Hint error:', error);
-    return NextResponse.json(
-      { error: 'Lỗi tạo gợi ý', details: error instanceof Error ? error.message : 'Unknown' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Lỗi tạo gợi ý' }, { status: 500 });
   }
 }
